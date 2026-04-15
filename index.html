@@ -1,0 +1,758 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TechNova – Sklep Elektroniczny</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    /* ── RESET & VARIABLES ────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:        #0f0f12;
+      --surface:   #18181d;
+      --card:      #1f1f26;
+      --border:    #2e2e3a;
+      --accent:    #e8ff5a;
+      --accent2:   #5affcf;
+      --text:      #eeeef2;
+      --muted:     #7e7e99;
+      --danger:    #ff5a5a;
+      --radius:    14px;
+      --nav-h:     68px;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    /* ── NAVBAR ──────────────────────────────────────── */
+    /* Selector demo target: #navbar  |  .navbar  |  nav#navbar */
+    #navbar {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      height: var(--nav-h);
+      background: rgba(15,15,18,.88);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 32px;
+    }
+
+    /* Selector demo: #navbar .nav-logo */
+    .nav-logo {
+      font-family: 'DM Serif Display', serif;
+      font-size: 1.6rem;
+      letter-spacing: -.5px;
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    .nav-logo span {
+      color: var(--accent2);
+    }
+
+    /* Selector demo: #navbar .nav-right */
+    .nav-right {
+      display: flex;
+      align-items: center;
+      gap: 28px;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 24px;
+      list-style: none;
+    }
+
+    .nav-links li a {
+      font-size: .9rem;
+      font-weight: 500;
+      color: var(--muted);
+      text-decoration: none;
+      transition: color .2s;
+    }
+
+    .nav-links li a:hover { color: var(--text); }
+
+    /* ── CART ICON CONTAINER ─────────────────────────── */
+    /* Selector demo: .cart-wrapper  |  #navbar .cart-wrapper */
+    .cart-wrapper {
+      position: relative;
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+    }
+
+    /* Selector demo: .cart-wrapper .cart-icon */
+    .cart-wrapper .cart-icon {
+      width: 40px;
+      height: 40px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: border-color .2s, background .2s;
+    }
+
+    .cart-wrapper:hover .cart-icon {
+      border-color: var(--accent);
+      background: rgba(232,255,90,.08);
+    }
+
+    .cart-wrapper .cart-icon svg {
+      width: 18px;
+      height: 18px;
+      stroke: var(--text);
+      fill: none;
+      stroke-width: 1.8;
+    }
+
+    /* ── CART BADGE ──────────────────────────────────── */
+    /* Selector demo: .cart-badge  |  #cart-badge  |  .cart-wrapper > span */
+    #cart-badge {
+      position: absolute;
+      top: -5px;
+      right: -5px;
+      min-width: 20px;
+      height: 20px;
+      padding: 0 5px;
+      background: var(--accent);
+      color: #0f0f12;
+      font-size: .68rem;
+      font-weight: 700;
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      line-height: 1;
+      /* hidden by default */
+      opacity: 0;
+      transform: scale(0);
+      transition: opacity .25s, transform .25s cubic-bezier(.34,1.56,.64,1);
+      pointer-events: none;
+      /* Nested structure for selector demo: #cart-badge > span > b */
+    }
+
+    #cart-badge span {
+      display: contents;
+    }
+
+    #cart-badge span b {
+      font-weight: 700;
+      letter-spacing: -.3px;
+    }
+
+    #cart-badge.visible {
+      opacity: 1;
+      transform: scale(1);
+    }
+
+    #cart-badge.bump {
+      animation: bump .35s cubic-bezier(.34,1.56,.64,1);
+    }
+
+    @keyframes bump {
+      0%   { transform: scale(1); }
+      50%  { transform: scale(1.45); }
+      100% { transform: scale(1); }
+    }
+
+    /* ── HERO STRIP ─────────────────────────────────── */
+    .hero-strip {
+      padding: 48px 32px 32px;
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .hero-strip h1 {
+      font-family: 'DM Serif Display', serif;
+      font-size: clamp(2rem, 4vw, 3.2rem);
+      line-height: 1.1;
+      max-width: 520px;
+    }
+
+    .hero-strip h1 em {
+      color: var(--accent);
+      font-style: normal;
+    }
+
+    .hero-strip p {
+      color: var(--muted);
+      font-size: .9rem;
+      max-width: 240px;
+      text-align: right;
+      line-height: 1.6;
+    }
+
+    /* ── PRODUCT GRID ───────────────────────────────── */
+    /* Selector demo: .product-grid  |  main .product-grid */
+    main {
+      padding: 40px 32px 80px;
+    }
+
+    .product-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 20px;
+    }
+
+    /* ── PRODUCT CARD ───────────────────────────────── */
+    /* Selector demo: .product-card  |  .product-grid .product-card */
+    .product-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      transition: border-color .25s, transform .25s;
+    }
+
+    .product-card:hover {
+      border-color: rgba(232,255,90,.35);
+      transform: translateY(-3px);
+    }
+
+    /* Selector demo: .product-card .product-image */
+    .product-card .product-image {
+      aspect-ratio: 16/10;
+      background: var(--surface);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-bottom: 1px solid var(--border);
+      padding: 24px;
+    }
+
+    .product-card .product-image svg {
+      width: 72px;
+      height: 72px;
+      opacity: .5;
+    }
+
+    /* Selector demo: .product-card .product-info */
+    .product-card .product-info {
+      padding: 20px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    /* Selector demo: .product-info .product-category */
+    .product-info .product-category {
+      font-size: .72rem;
+      font-weight: 600;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: var(--accent2);
+    }
+
+    /* Selector demo: .product-info .product-name  |  .product-card h2 */
+    .product-info .product-name {
+      font-family: 'DM Serif Display', serif;
+      font-size: 1.2rem;
+      line-height: 1.25;
+      color: var(--text);
+    }
+
+    /* Selector demo: .product-info .product-desc */
+    .product-info .product-desc {
+      font-size: .83rem;
+      color: var(--muted);
+      line-height: 1.55;
+      flex: 1;
+    }
+
+    /* Selector demo: .product-info .product-price-row */
+    .product-info .product-price-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 12px;
+    }
+
+    /* Selector demo: .product-price-row .price-wrapper  |  div.price-wrapper */
+    .product-price-row .price-wrapper {
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Selector demo: .price-wrapper .price-label */
+    .price-wrapper .price-label {
+      font-size: .7rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: .06em;
+    }
+
+    /* Selector demo: .price-wrapper .price  |  .product-card .price  |  div > span > b.price */
+    .price-wrapper .price {
+      display: flex;
+      align-items: baseline;
+      gap: 2px;
+    }
+
+    /* Nested tag chain: div.price-wrapper > span.price > b.price-amount */
+    .price-wrapper .price b.price-amount {
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: var(--accent);
+      letter-spacing: -.5px;
+    }
+
+    .price-wrapper .price .price-currency {
+      font-size: .85rem;
+      color: var(--muted);
+    }
+
+    /* ── ADD TO CART BUTTON ─────────────────────────── */
+    /* Selector demo: .btn-add-to-cart  |  .product-card button  |  button[data-product-id] */
+    .btn-add-to-cart {
+      padding: 10px 18px;
+      background: var(--accent);
+      color: #0f0f12;
+      font-family: 'DM Sans', sans-serif;
+      font-size: .82rem;
+      font-weight: 700;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      letter-spacing: .02em;
+      transition: background .2s, transform .15s;
+      white-space: nowrap;
+    }
+
+    .btn-add-to-cart:hover {
+      background: #f5ff85;
+      transform: scale(1.04);
+    }
+
+    .btn-add-to-cart:active {
+      transform: scale(.97);
+    }
+
+    .btn-add-to-cart.added {
+      background: var(--accent2);
+    }
+
+    /* ── TOAST NOTIFICATION ─────────────────────────── */
+    #toast {
+      position: fixed;
+      bottom: 28px;
+      right: 28px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-left: 3px solid var(--accent2);
+      color: var(--text);
+      font-size: .85rem;
+      padding: 14px 20px;
+      border-radius: 10px;
+      opacity: 0;
+      transform: translateY(12px);
+      transition: opacity .3s, transform .3s;
+      pointer-events: none;
+      max-width: 280px;
+      z-index: 200;
+    }
+
+    #toast.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* ── FOOTER ─────────────────────────────────────── */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 24px 32px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      color: var(--muted);
+      font-size: .8rem;
+    }
+
+    footer a { color: var(--muted); text-decoration: none; }
+    footer a:hover { color: var(--accent); }
+
+    /* ── SELECTOR CHEATSHEET PANEL ──────────────────── */
+    #cheatsheet {
+      margin: 0 32px 40px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 24px 28px;
+    }
+
+    #cheatsheet h2 {
+      font-size: .8rem;
+      font-weight: 600;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: var(--accent2);
+      margin-bottom: 14px;
+    }
+
+    .selector-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    /* Selector demo: .selector-chip */
+    .selector-chip {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 5px 10px;
+      font-size: .75rem;
+      font-family: 'Courier New', monospace;
+      color: var(--accent);
+    }
+
+    .selector-chip .chip-type {
+      color: var(--muted);
+      font-size: .68rem;
+      margin-right: 4px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ══════════════════════════════════════════════
+       NAVBAR
+       Selektory: #navbar | nav#navbar | .nav-right
+  ═══════════════════════════════════════════════ -->
+  <nav id="navbar" class="navbar">
+
+    <a href="#" class="nav-logo">Tech<span>Nova</span></a>
+
+    <ul class="nav-links">
+      <li><a href="#">Oferta</a></li>
+      <li><a href="#">Promocje</a></li>
+      <li><a href="#">O nas</a></li>
+    </ul>
+
+    <div class="nav-right">
+
+      <!-- CART WRAPPER
+           Selektory: .cart-wrapper | #navbar .cart-wrapper | .nav-right > div -->
+      <div class="cart-wrapper" id="cart-wrapper" title="Koszyk">
+
+        <!-- CART ICON
+             Selektory: .cart-icon | .cart-wrapper .cart-icon -->
+        <div class="cart-icon">
+          <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/>
+            <line x1="3" y1="6" x2="21" y2="6"/>
+            <path d="M16 10a4 4 0 01-8 0"/>
+          </svg>
+        </div>
+
+        <!-- CART BADGE
+             Selektory: #cart-badge | .cart-badge | .cart-wrapper > #cart-badge
+             XPath:     //*[@id='cart-badge']  |  //span[@id='cart-badge']
+             Zagnieżdżenie:  #cart-badge > span > b  (div > span > b) -->
+        <span id="cart-badge" class="cart-badge" role="status" aria-label="Liczba produktów w koszyku">
+          <span class="badge-inner"><b id="cart-count" class="badge-count">0</b></span>
+        </span>
+
+      </div><!-- /.cart-wrapper -->
+
+    </div><!-- /.nav-right -->
+
+  </nav>
+
+  <!-- ══════════════════════════════════════════════
+       HERO
+  ═══════════════════════════════════════════════ -->
+  <div class="hero-strip">
+    <h1>Najlepszy sprzęt<br>dla <em>wymagających</em>.</h1>
+    <p>Fikcyjne dane — demo dla nagrania poradnika selektorów CSS i XPath.</p>
+  </div>
+
+  <!-- ══════════════════════════════════════════════
+       SELEKTOR CHEATSHEET (element pomocniczy)
+  ═══════════════════════════════════════════════ -->
+  <section id="cheatsheet">
+    <h2>🎯 Selektory do ćwiczeń – licznik koszyka</h2>
+    <div class="selector-list">
+      <span class="selector-chip"><span class="chip-type">ID</span>#cart-badge</span>
+      <span class="selector-chip"><span class="chip-type">Class</span>.cart-badge</span>
+      <span class="selector-chip"><span class="chip-type">Nested</span>#cart-badge span b</span>
+      <span class="selector-chip"><span class="chip-type">Child</span>#cart-badge > span > b</span>
+      <span class="selector-chip"><span class="chip-type">Attr</span>span[id='cart-badge']</span>
+      <span class="selector-chip"><span class="chip-type">XPath</span>//*[@id='cart-badge']</span>
+      <span class="selector-chip"><span class="chip-type">XPath</span>//span[@class='badge-inner']/b</span>
+      <span class="selector-chip"><span class="chip-type">XPath</span>//b[@id='cart-count']</span>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════════
+       PRODUCT GRID
+       Selektory: main | .product-grid | main .product-grid
+  ═══════════════════════════════════════════════ -->
+  <main id="main-content">
+    <div class="product-grid" id="product-grid">
+
+      <!-- ── KARTA 1 ───────────────────────────────
+           Selektory: .product-card | .product-grid .product-card
+           button: .btn-add-to-cart | button[data-product-id='1']
+      ─────────────────────────────────────────── -->
+      <article class="product-card" id="product-1" data-product="smartfon-x1">
+        <div class="product-image">
+          <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="16" y="4" width="32" height="56" rx="5" stroke="#5affcf" stroke-width="2"/>
+            <circle cx="32" cy="52" r="3" stroke="#5affcf" stroke-width="1.5"/>
+            <line x1="26" y1="10" x2="38" y2="10" stroke="#5affcf" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div class="product-info">
+          <span class="product-category">Smartfony</span>
+          <h2 class="product-name">Smartfon X-1</h2>
+          <p class="product-desc">6,7" AMOLED 144 Hz · 200 Mpx · 5800 mAh · Android 16</p>
+          <div class="product-price-row">
+            <div class="price-wrapper">
+              <span class="price-label">Cena</span>
+              <span class="price">
+                <b class="price-amount">2 999</b>
+                <span class="price-currency">zł</span>
+              </span>
+            </div>
+            <button class="btn-add-to-cart" data-product-id="1" data-product-name="Smartfon X-1">
+              Dodaj do koszyka
+            </button>
+          </div>
+        </div>
+      </article>
+
+      <!-- ── KARTA 2 ─────────────────────────────── -->
+      <article class="product-card" id="product-2" data-product="laptop-pro-max">
+        <div class="product-image">
+          <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="8" y="12" width="48" height="32" rx="3" stroke="#e8ff5a" stroke-width="2"/>
+            <rect x="4" y="46" width="56" height="6" rx="2" stroke="#e8ff5a" stroke-width="2"/>
+            <line x1="20" y1="49" x2="44" y2="49" stroke="#e8ff5a" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div class="product-info">
+          <span class="product-category">Laptopy</span>
+          <h2 class="product-name">Laptop Pro Max</h2>
+          <p class="product-desc">16" IPS · Ryzen 9 8950HX · 64 GB RAM · 2 TB NVMe · RTX 5080</p>
+          <div class="product-price-row">
+            <div class="price-wrapper">
+              <span class="price-label">Cena</span>
+              <span class="price">
+                <b class="price-amount">9 499</b>
+                <span class="price-currency">zł</span>
+              </span>
+            </div>
+            <button class="btn-add-to-cart" data-product-id="2" data-product-name="Laptop Pro Max">
+              Dodaj do koszyka
+            </button>
+          </div>
+        </div>
+      </article>
+
+      <!-- ── KARTA 3 ─────────────────────────────── -->
+      <article class="product-card" id="product-3" data-product="tablet-air-s">
+        <div class="product-image">
+          <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="12" y="6" width="40" height="52" rx="4" stroke="#5affcf" stroke-width="2"/>
+            <circle cx="32" cy="52" r="2" stroke="#5affcf" stroke-width="1.5"/>
+          </svg>
+        </div>
+        <div class="product-info">
+          <span class="product-category">Tablety</span>
+          <h2 class="product-name">Tablet Air S</h2>
+          <p class="product-desc">11" OLED · Helio X40 · 12 GB RAM · 256 GB · stylus w zestawie</p>
+          <div class="product-price-row">
+            <div class="price-wrapper">
+              <span class="price-label">Cena</span>
+              <span class="price">
+                <b class="price-amount">1 799</b>
+                <span class="price-currency">zł</span>
+              </span>
+            </div>
+            <button class="btn-add-to-cart" data-product-id="3" data-product-name="Tablet Air S">
+              Dodaj do koszyka
+            </button>
+          </div>
+        </div>
+      </article>
+
+      <!-- ── KARTA 4 ─────────────────────────────── -->
+      <article class="product-card" id="product-4" data-product="sluchawki-nova-bt">
+        <div class="product-image">
+          <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M16 30c0-8.84 7.16-16 16-16s16 7.16 16 16" stroke="#e8ff5a" stroke-width="2" stroke-linecap="round"/>
+            <rect x="8" y="30" width="10" height="16" rx="3" stroke="#e8ff5a" stroke-width="2"/>
+            <rect x="46" y="30" width="10" height="16" rx="3" stroke="#e8ff5a" stroke-width="2"/>
+          </svg>
+        </div>
+        <div class="product-info">
+          <span class="product-category">Audio</span>
+          <h2 class="product-name">Słuchawki Nova BT</h2>
+          <p class="product-desc">ANC aktywna · 40 h pracy · Bluetooth 5.4 · składana konstrukcja</p>
+          <div class="product-price-row">
+            <div class="price-wrapper">
+              <span class="price-label">Cena</span>
+              <span class="price">
+                <b class="price-amount">549</b>
+                <span class="price-currency">zł</span>
+              </span>
+            </div>
+            <button class="btn-add-to-cart" data-product-id="4" data-product-name="Słuchawki Nova BT">
+              Dodaj do koszyka
+            </button>
+          </div>
+        </div>
+      </article>
+
+      <!-- ── KARTA 5 ─────────────────────────────── -->
+      <article class="product-card" id="product-5" data-product="smartwatch-pulse-3">
+        <div class="product-image">
+          <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="20" y="16" width="24" height="32" rx="6" stroke="#5affcf" stroke-width="2"/>
+            <line x1="24" y1="12" x2="40" y2="12" stroke="#5affcf" stroke-width="2" stroke-linecap="round"/>
+            <line x1="24" y1="52" x2="40" y2="52" stroke="#5affcf" stroke-width="2" stroke-linecap="round"/>
+            <polyline points="22,32 26,28 30,36 34,30 38,32 42,32" stroke="#5affcf" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <div class="product-info">
+          <span class="product-category">Wearables</span>
+          <h2 class="product-name">Smartwatch Pulse 3</h2>
+          <p class="product-desc">AMOLED 1.4" · GPS · EKG · pulsoksymetr · 7 dni baterii · IP68</p>
+          <div class="product-price-row">
+            <div class="price-wrapper">
+              <span class="price-label">Cena</span>
+              <span class="price">
+                <b class="price-amount">899</b>
+                <span class="price-currency">zł</span>
+              </span>
+            </div>
+            <button class="btn-add-to-cart" data-product-id="5" data-product-name="Smartwatch Pulse 3">
+              Dodaj do koszyka
+            </button>
+          </div>
+        </div>
+      </article>
+
+      <!-- ── KARTA 6 ─────────────────────────────── -->
+      <article class="product-card" id="product-6" data-product="router-mesh-giga">
+        <div class="product-image">
+          <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="12" y="30" width="40" height="18" rx="4" stroke="#e8ff5a" stroke-width="2"/>
+            <circle cx="32" cy="39" r="3" stroke="#e8ff5a" stroke-width="1.5"/>
+            <path d="M22 25c0-5.52 4.48-10 10-10s10 4.48 10 10" stroke="#e8ff5a" stroke-width="2" stroke-linecap="round"/>
+            <path d="M26 25c0-3.31 2.69-6 6-6s6 2.69 6 6" stroke="#e8ff5a" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div class="product-info">
+          <span class="product-category">Sieć</span>
+          <h2 class="product-name">Router Mesh Giga</h2>
+          <p class="product-desc">Wi-Fi 7 · 10 Gbps · Tri-band · zasięg 300 m² · 8× LAN 2.5G</p>
+          <div class="product-price-row">
+            <div class="price-wrapper">
+              <span class="price-label">Cena</span>
+              <span class="price">
+                <b class="price-amount">1 249</b>
+                <span class="price-currency">zł</span>
+              </span>
+            </div>
+            <button class="btn-add-to-cart" data-product-id="6" data-product-name="Router Mesh Giga">
+              Dodaj do koszyka
+            </button>
+          </div>
+        </div>
+      </article>
+
+    </div><!-- /#product-grid -->
+  </main>
+
+  <!-- ══════════════════════════════════════════════
+       TOAST
+  ═══════════════════════════════════════════════ -->
+  <div id="toast" role="alert" aria-live="polite"></div>
+
+  <!-- ══════════════════════════════════════════════
+       FOOTER
+  ═══════════════════════════════════════════════ -->
+  <footer>
+    <span>© 2025 TechNova — Fikcyjny sklep na potrzeby demo</span>
+    <span>Dane nie są prawdziwe · <a href="#">Polityka prywatności</a></span>
+  </footer>
+
+  <!-- ══════════════════════════════════════════════
+       JAVASCRIPT
+  ═══════════════════════════════════════════════ -->
+  <script>
+    // ── STATE ──────────────────────────────────────
+    let cartCount = 0;
+
+    // ── ELEMENTS ───────────────────────────────────
+    const badge     = document.getElementById('cart-badge');   // #cart-badge
+    const countEl   = document.getElementById('cart-count');   // #cart-count  (b element)
+    const toast     = document.getElementById('toast');
+    const buttons   = document.querySelectorAll('.btn-add-to-cart');
+
+    // ── UPDATE BADGE ───────────────────────────────
+    function updateBadge() {
+      // Update the nested  #cart-badge > span > b  text
+      countEl.textContent = cartCount;
+
+      if (cartCount > 0) {
+        badge.classList.add('visible');
+        // Trigger bump animation
+        badge.classList.remove('bump');
+        void badge.offsetWidth;           // reflow trick
+        badge.classList.add('bump');
+      } else {
+        badge.classList.remove('visible');
+      }
+    }
+
+    // ── SHOW TOAST ─────────────────────────────────
+    let toastTimer;
+    function showToast(name) {
+      toast.textContent = `✓ Dodano do koszyka: ${name}`;
+      toast.classList.add('show');
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => toast.classList.remove('show'), 2500);
+    }
+
+    // ── BUTTON LISTENERS ───────────────────────────
+    buttons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        cartCount++;
+        updateBadge();
+        showToast(btn.dataset.productName);
+
+        // Visual feedback on button
+        btn.textContent = '✓ Dodano!';
+        btn.classList.add('added');
+        btn.disabled = true;
+        setTimeout(() => {
+          btn.textContent = 'Dodaj do koszyka';
+          btn.classList.remove('added');
+          btn.disabled = false;
+        }, 1400);
+      });
+    });
+  </script>
+</body>
+</html>
